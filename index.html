@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Predicción de Coste RAM</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+
+        select, input, button {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            margin-top: 20px;
+            background: #007BFF;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .resultado {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Predicción de Coste RAM</h2>
+
+    <label>Marca</label>
+    <select id="Marca">
+        <option>Corsair</option>
+        <option>G.Skill</option>
+        <option>Kingston</option>
+        <option>Crucial</option>
+        <option>ADATA</option>
+    </select>
+
+    <label>Tipo</label>
+    <select id="Tipo">
+        <option>DDR4</option>
+        <option>DDR5</option>
+    </select>
+
+    <label>Capacidad (GB)</label>
+    <select id="Capacidad_GB">
+        <option>8</option>
+        <option>16</option>
+        <option>32</option>
+        <option>64</option>
+    </select>
+
+    <!-- 🔥 INPUT NUMÉRICO -->
+    <label>Velocidad (MHz)</label>
+    <input type="number" id="Velocidad_MHz" min="2000" max="8000" step="100" value="3200">
+
+    <!-- 🔥 INPUT NUMÉRICO -->
+    <label>Latencia CAS</label>
+    <input type="number" id="Latencia_CAS" min="10" max="50" step="1" value="16">
+
+    <!-- 🔥 INPUT NUMÉRICO -->
+    <label>Voltaje</label>
+    <input type="number" id="Voltaje" min="1.0" max="1.6" step="0.01" value="1.35">
+
+    <label>RGB</label>
+    <select id="RGB">
+        <option value="true">Sí</option>
+        <option value="false">No</option>
+    </select>
+
+    <label>Disipador</label>
+    <select id="Disipador">
+        <option>Sí</option>
+        <option>No</option>
+    </select>
+
+    <!-- 🔥 INPUT NUMÉRICO -->
+    <label>Módulos</label>
+    <input type="number" id="Modulos" min="1" max="8" step="1" value="2">
+
+    <button onclick="predecir()">Calcular coste</button>
+
+    <div class="resultado" id="resultado"></div>
+</div>
+
+<script>
+async function predecir() {
+
+    const datos = {
+        Marca: document.getElementById("Marca").value,
+        Tipo: document.getElementById("Tipo").value,
+        Capacidad_GB: Number(document.getElementById("Capacidad_GB").value),
+        Velocidad_MHz: Number(document.getElementById("Velocidad_MHz").value),
+        Latencia_CAS: Number(document.getElementById("Latencia_CAS").value),
+        Voltaje: Number(document.getElementById("Voltaje").value),
+        RGB: document.getElementById("RGB").value === "true",
+        Disipador: document.getElementById("Disipador").value,
+        Modulos: Number(document.getElementById("Modulos").value)
+    };
+
+    try {
+        const response = await fetch("http://127.0.0.1:8000/predict", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ datos })
+        });
+
+        const data = await response.json();
+
+        document.getElementById("resultado").innerText =
+            "💰 Coste estimado: $" + data.resultado.prediccion_coste;
+
+    } catch (error) {
+        document.getElementById("resultado").innerText =
+            "❌ Error al calcular la predicción";
+    }
+}
+</script>
+
+</body>
+</html>
